@@ -30,11 +30,13 @@ public class ModifyItemCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess, CommandManager.RegistrationEnvironment environment) {
         LiteralArgumentBuilder<ServerCommandSource> literalBuilder = CommandManager.literal("modifytime").requires(source -> source.hasPermissionLevel(2));
 
-        var itemArgument = CommandManager.argument("item", ItemStackArgumentType.itemStack(registryAccess));
+        var lastArgument = CommandManager.argument("nbtvalue", StringArgumentType.string());
 
         literalBuilder
                 .then(CommandManager.argument("player", EntityArgumentType.player())
-                        .then(itemArgument));
+                        .then(CommandManager.argument("item", ItemStackArgumentType.itemStack(registryAccess))
+                                .then(CommandManager.argument("nbt", StringArgumentType.string())
+                                        .then(lastArgument))));
 
         for (ModifyItemOperation operation : ModifyItemOperation.values()) {
             LiteralArgumentBuilder<ServerCommandSource> operationBuilder = CommandManager.literal(operation.name());
@@ -43,7 +45,7 @@ public class ModifyItemCommand {
                         .then(CommandManager.argument("value", StringArgumentType.string())
                                 .executes(context -> modifyItem(context, operation, parameter))));
             }
-            itemArgument.then(operationBuilder);
+            lastArgument.then(operationBuilder);
         }
 
         dispatcher.register(literalBuilder);
@@ -51,6 +53,8 @@ public class ModifyItemCommand {
 
     private static int modifyItem(CommandContext<ServerCommandSource> context, ModifyItemOperation operation, ModifyItemParameter parameter) throws CommandSyntaxException {
         var item = ItemStackArgumentType.getItemStackArgument(context, "item");
+        var nbt = StringArgumentType.getString(context, "nbt");
+        var nbtValue = StringArgumentType.getString(context, "nbtvalue");
         var player = EntityArgumentType.getPlayer(context, "player");
         var value = StringArgumentType.getString(context, "value");
 
