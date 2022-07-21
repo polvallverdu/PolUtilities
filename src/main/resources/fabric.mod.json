@@ -16,7 +16,7 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "engineer.pol.client.PolUtilitiesClient"
+      "engineer.pol.polutilities.client.PolUtilitiesClient"
     ],
     "main": [
       "engineer.pol.polutilities.PolUtilities"
