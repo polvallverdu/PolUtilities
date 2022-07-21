@@ -28,7 +28,7 @@ public class MotionCommand {
         for (MotionOperation operation : MotionOperation.values()) {
             literalBuilder.then(CommandManager.literal(operation.name().toLowerCase())
                     .then(CommandManager.argument("target", EntityArgumentType.entities())
-                            .then(CommandManager.argument("vel", Vec3ArgumentType.vec3()).executes(context -> motion(context, operation))))
+                            .then(CommandManager.argument("vel", Vec3ArgumentType.vec3(false)).executes(context -> motion(context, operation))))
             );
         }
 
