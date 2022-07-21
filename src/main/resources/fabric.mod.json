@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "PolUtilities",
+  "version": "${version}",
+  "name": "PolUtilities",
+  "description": "A utils mod for my stuff",
+  "authors": [
+    "Pol",
+    "Nexxxxxxxxxxxxx"
+  ],
+  "contact": {
+    "website": "pol.engineer"
+  },
+  "license": "MIT",
+  "icon": "assets/PolUtilities/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "engineer.pol.client.PolUtilitiesClient"
+    ],
+    "main": [
+      "engineer.pol.polutilities.PolUtilities"
+    ]
+  },
+  "mixins": [
+    "PolUtilities.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.8",
+    "fabric": "*",
+    "minecraft": "1.19"
+  }
+}
