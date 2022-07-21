@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "PolUtilities",
+  "id": "polutilities",
   "version": "${version}",
   "name": "PolUtilities",
   "description": "A utils mod for my stuff",
