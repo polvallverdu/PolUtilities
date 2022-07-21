@@ -12,6 +12,7 @@ import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.argument.ItemStackArgumentType;
 import net.minecraft.command.argument.NbtElementArgumentType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtByte;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -100,7 +101,7 @@ public class ModifyItemCommand {
         NbtElement valueNbt = v instanceof NbtElement ? (NbtElement) v : null;
 
         for (ItemStack playerItem : getAllInventory(player)) {
-            if (isSimilar(item.createStack(count, false), playerItem, nbt, nbtValue)) continue;
+            if (!isSimilar(item.createStack(count, false), playerItem, nbt, nbtValue)) continue;
 
             switch (parameter) {
                 case NAME:
@@ -127,13 +128,20 @@ public class ModifyItemCommand {
                     break;
                 case NBT:
                     if (valueNbt.getType() != 10) break;
-                    playerItem.getOrCreateNbt().copyFrom((NbtCompound) valueNbt);
+
+                    if (operation == ModifyItemOperation.ADD) {
+                        playerItem.getOrCreateNbt().copyFrom((NbtCompound) valueNbt);
+                    } else if (operation == ModifyItemOperation.SET) {
+                        playerItem.setNbt((NbtCompound) valueNbt);
+                    }
                     break;
                 case CUSTOMMODELDATA:
                     playerItem.getOrCreateNbt().getCompound("tag").putInt(
                             "CustomModelData", Integer.parseInt(valueString));
                     break;
             }
+            player.currentScreenHandler.sendContentUpdates();
+            player.playerScreenHandler.onContentChanged(player.getInventory());
             return 1;
         }
 
@@ -155,7 +163,7 @@ public class ModifyItemCommand {
         }
 
         context.getSource().sendError(Text.literal("false"));
-        return 1;
+        return 0;
     }
 
     private static List<ItemStack> getAllInventory(ServerPlayerEntity player) {
@@ -168,7 +176,11 @@ public class ModifyItemCommand {
     }
 
     private static boolean isSimilar(ItemStack ref, ItemStack item, String tag, NbtElement value) {
-        return ref.getCount() == item.getCount() && hasSameMaterial(ref, item) && hasCustomModelData(ref, item) && !hasTag(item, tag, value) && hasSimilarEnchantments(ref, item);
+        return ref.getCount() == item.getCount() &&
+                hasSameMaterial(ref, item) &&
+                hasCustomModelData(ref, item) &&
+                hasTag(item, tag, value) &&
+                hasSimilarEnchantments(ref, item);
     }
 
     private static boolean hasSimilarEnchantments(ItemStack ref, ItemStack item) {
@@ -201,9 +213,9 @@ public class ModifyItemCommand {
     }
 
     private static boolean hasTag(ItemStack item, String tag, NbtElement tagValue) {
-        if (!item.getOrCreateNbt().getCompound("tag").contains(tag)) return false;
+        NbtElement nbt = item.getOrCreateNbt().get(tag);
 
-        return item.getOrCreateNbt().getCompound("tag").get(tag).equals(tagValue);
+        return nbt == null ? NbtByte.ZERO.equals(tagValue) : nbt.equals(tagValue);
     }
 
 }
