@@ -180,10 +180,10 @@ public class ModifyItemCommand {
                 hasSameMaterial(ref, item) &&
                 hasCustomModelData(ref, item) &&
                 hasTag(item, tag, value) &&
-                hasSimilarEnchantments(ref, item);
+                containsEnchantments(ref, item);
     }
 
-    private static boolean hasSimilarEnchantments(ItemStack ref, ItemStack item) {
+    /*private static boolean hasSimilarEnchantments(ItemStack ref, ItemStack item) {
         NbtList enchantmentsRef = ref.getEnchantments();
         NbtList enchantmentsItem = item.getEnchantments();
         if (enchantmentsRef.size() != enchantmentsItem.size()) {
@@ -199,6 +199,26 @@ public class ModifyItemCommand {
             if (enchantmentRef.getInt("lvl") != enchantmentItem.getInt("lvl")) {
                 return false;
             }
+        }
+
+        return true;
+    }*/
+
+    private static boolean containsEnchantments(ItemStack ref, ItemStack item) {
+        NbtList enchantmentsRef = ref.getEnchantments();
+        NbtList enchantmentsItem = item.getEnchantments();
+
+        for (int i = 0; i < enchantmentsRef.size(); i++) {
+            NbtCompound enchantmentRef = enchantmentsRef.getCompound(i);
+            if(!enchantmentsItem.contains(enchantmentRef)) return false;
+
+            /*NbtCompound enchantmentItem = enchantmentsItem.getCompound(i);
+            if (!enchantmentRef.getString("id").equals(enchantmentItem.getString("id"))) {
+                return false;
+            }
+            if (enchantmentRef.getInt("lvl") != enchantmentItem.getInt("lvl")) {
+                return false;
+            }*/
         }
 
         return true;
